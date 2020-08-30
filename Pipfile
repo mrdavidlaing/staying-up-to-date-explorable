@@ -4,10 +4,12 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+ipykernel = "*"
 
 [packages]
 dash = "*"
 pandas = "*"
+dash-bootstrap-components = "*"
 
 [requires]
 python_version = "3.8"
