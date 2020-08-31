@@ -12,9 +12,11 @@ jupyter = "*"
 dash = "*"
 pandas = "*"
 dash-bootstrap-components = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.8"
 
 [scripts]
 dashapp_dev = "python app.py"
+deploy_to_pws = 'cf push staying-up-to-date-explorable -b python_buildpack -m 256M -c "gunicorn --bind=0.0.0.0:8080 app:server"'

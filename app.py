@@ -22,6 +22,7 @@ k8s_support_escalator_figure.add_shape(x0=0.5, y0=0, x1=0.5, y1=1, line=dict(col
 k8s_support_escalator_figure.update_layout(annotations=[dict(x=0.5, y=1.05, showarrow=False, text="TODAY", xref="paper", yref="paper" )])
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SKETCHY])
+server = app.server #underlying Flask server - will be used when running via gunicorn
 
 app.layout = dbc.Container(children=[
     dbc.NavbarSimple(
