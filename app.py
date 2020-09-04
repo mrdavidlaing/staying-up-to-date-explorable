@@ -21,6 +21,18 @@ k8s_support_escalator_figure = px.timeline(k8s_releases, x_start="release_date",
 k8s_support_escalator_figure.add_shape(x0=0.5, y0=0, x1=0.5, y1=1, line=dict(color="Black", width=3), type="line", xref="paper", yref="paper",)
 k8s_support_escalator_figure.update_layout(annotations=[dict(x=0.5, y=1.05, showarrow=False, text="TODAY", xref="paper", yref="paper" )])
 
+release_age_measurement_figure = go.Figure(k8s_support_escalator_figure)
+release_age_measurement_figure.update_xaxes(range=['2018-05-01','2019-05-01'])
+release_age_measurement_figure.update_yaxes(range=[7,9])
+release_age_measurement_figure.add_annotation(
+    axref='x', ax=k8s_releases.at[8,'release_date'], x=k8s_releases.at[8,'release_date'] + relativedelta(months=+4),
+    ayref='y', ay=k8s_releases.at[8,'version'], y=k8s_releases.at[8,'version'],
+    showarrow=True, arrowhead=4, arrowsize=2)
+release_age_measurement_figure.add_annotation(
+    x = k8s_releases.at[8,'release_date'] + relativedelta(months=+2),
+    y = k8s_releases.at[8,'version'], yref="y",
+    showarrow=True, arrowhead=1, arrowsize=0.3, text="release age = 123 days")
+
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SKETCHY])
 server = app.server #underlying Flask server - will be used when running via gunicorn
 
@@ -77,6 +89,17 @@ app.layout = dbc.Container(children=[
                 The result is what we call the "support escalator".  In the same way that you need to constantly be taking steps up an escalator if you wanted to 
                 stay still; so to do you constantly need to be planning and executing your next Kubernetes upgrade is you want to stay running a supported version. 
             '''), width="auto")),
+            dbc.Row(dbc.Col(html.H1("Release Age"))),
+            dbc.Row(dbc.Col(dcc.Markdown('''
+                At any point in time, we can measure the relative age of an installation by calculating the number of days between the current date
+                and the release date of the version being used.  We call this measurement the *release age*, as illustrated below.
+            '''), width="auto")),
+            dbc.Row(
+                dbc.Col(dcc.Graph(
+                    id='release-age-measurement-graph',
+                    figure = release_age_measurement_figure
+                ), width=12)
+            ),
         ]
     )
 ])
