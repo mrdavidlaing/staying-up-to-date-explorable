@@ -8,12 +8,14 @@ import plotly.io as pio
 import pandas as pd
 from datetime import date
 from dateutil.relativedelta import relativedelta
+from upgrade_model import remain_on_latest
+from upgrade_model import k8s_releases_loader
 
 pio.templates["sketchy"] = go.layout.Template()
 pio.templates["sketchy"].layout = go.Layout(font=dict(family='Neucha, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'))
 pio.templates.default = "ggplot2+sketchy"
 
-k8s_releases = pd.read_csv("./k8s-releases.csv", parse_dates=['release_date','end_of_support_date'] )
+k8s_releases = k8s_releases_loader.load()
 k8s_releases_date_range = pd.date_range(k8s_releases.release_date.min(),k8s_releases.end_of_support_date.max(), freq='1M').to_list()
 current_date_slider_marks = { i:d.strftime('%Y-%m') if i%6==0 else "" for i, d in enumerate(k8s_releases_date_range) }
 
@@ -32,6 +34,9 @@ release_age_measurement_figure.add_annotation(
     x = k8s_releases.at[8,'release_date'] + relativedelta(months=+2),
     y = k8s_releases.at[8,'version'], yref="y",
     showarrow=True, arrowhead=1, arrowsize=0.3, text="release age = 123 days")
+
+remain_on_latest_env_state = remain_on_latest.compute(start_date=k8s_releases.release_date.min(), end_date=k8s_releases.end_of_support_date.max())
+release_age_remain_on_latest_figure = px.line(remain_on_latest_env_state, x="at_date", y="release_age")
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.SKETCHY])
 server = app.server #underlying Flask server - will be used when running via gunicorn
@@ -98,6 +103,15 @@ app.layout = dbc.Container(children=[
                 dbc.Col(dcc.Graph(
                     id='release-age-measurement-graph',
                     figure = release_age_measurement_figure
+                ), width=12)
+            ),
+            dbc.Row(dbc.Col(dcc.Markdown('''
+                Remain on latest
+            '''), width="auto")),
+            dbc.Row(
+                dbc.Col(dcc.Graph(
+                    id='release-age-remain-on-latest-graph',
+                    figure = release_age_remain_on_latest_figure
                 ), width=12)
             ),
         ]

@@ -7,12 +7,15 @@ verify_ssl = true
 ipykernel = "*"
 pylint = "*"
 jupyter = "*"
+pytest = "*"
+rope = "*"
 
 [packages]
 dash = "*"
 pandas = "*"
 dash-bootstrap-components = "*"
 gunicorn = "*"
+python-dotenv = "*"
 
 [requires]
 python_version = "3.8"
