@@ -87,6 +87,10 @@ app.layout = dbc.Container(children=[
 def update_graph(current_mid_date_index):
     mid_date = k8s_releases_date_range[current_mid_date_index]
     k8s_support_escalator_figure.update_xaxes(range=[mid_date + relativedelta(months=-6), mid_date + relativedelta(months=+6)])
+    k8s_support_escalator_figure.update_yaxes(range=[
+        max(0, k8s_releases.set_index('release_date').index.get_loc(mid_date, method='nearest') - 4),
+        min(len(k8s_releases), k8s_releases.set_index('end_of_support_date').index.get_loc(mid_date, method='nearest') + 4)
+    ])
     return k8s_support_escalator_figure
 
 @app.callback(dash.dependencies.Output('current-date-slider', 'value'),
