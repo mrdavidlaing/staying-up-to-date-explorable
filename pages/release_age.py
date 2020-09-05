@@ -72,7 +72,9 @@ layout = html.Div([
         ), width=7),
         dbc.Col(dcc.Graph(
             id='release-age-remain-on-latest-graph',
-            figure = release_age_remain_on_latest_figure
+            figure = release_age_remain_on_latest_figure,
+            animate=True,
+            animation_options= { 'frame': { 'redraw': True, }, 'transition': { 'duration': 750, 'easing': 'linear', }, },
         ), width=5)
     ]),
     dbc.Row(
