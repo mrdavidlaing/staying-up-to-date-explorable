@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 
 from app import app
 app.set_default_plotly_template()
+server = app.server #underlying Flask server - will be used when running via gunicorn
 
 from pages import support_escalator
 from pages import release_age
