@@ -82,7 +82,8 @@ app.layout = dbc.Container(children=[
                 ),dcc.Interval(
                     id='advance-current-date-slider-interval',
                     interval=3*1000, # in milliseconds
-                    n_intervals=0
+                    n_intervals=0,
+                    max_intervals=100
                 )], width=12)
             ),
             dbc.Row(dbc.Col(dcc.Markdown('''
