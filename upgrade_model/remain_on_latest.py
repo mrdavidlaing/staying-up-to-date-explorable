@@ -11,7 +11,7 @@ def predict_version(for_date):
     return k8s_release['version'][0], k8s_release['release_date'][0], k8s_release['end_of_support_date'][0], release_age[0]
 
 def compute(start_date, end_date):
-    months = pd.date_range(start=start_date, end=end_date, freq='M')
+    months = pd.date_range(start=start_date, end=end_date, freq='D')
     
     environment_ids = ['simple-env-1']
     environment_state = pd.DataFrame(
