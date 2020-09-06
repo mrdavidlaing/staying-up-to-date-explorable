@@ -16,6 +16,7 @@ pandas = "*"
 dash-bootstrap-components = "*"
 gunicorn = "*"
 python-dotenv = "*"
+traitlets = "==4.3.3"
 
 [requires]
 python_version = "3.8"
