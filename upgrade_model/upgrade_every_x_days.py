@@ -29,8 +29,8 @@ def compute(id, start_date, end_date, first_version, upgrade_every):
 
         days_since_last_upgrade+=1
 
-    environment_state['release_age'] = (environment_state['at_date'] - environment_state['release_date']).dt.days
     environment_state['release_date'] = pd.to_datetime(environment_state['release_date'])
     environment_state['end_of_support_date'] = pd.to_datetime(environment_state['end_of_support_date'])
+    environment_state['release_age'] = (environment_state['at_date'] - environment_state['release_date']).dt.days
 
     return environment_state
