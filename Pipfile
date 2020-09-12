@@ -9,6 +9,7 @@ traitlets = ">=5.0.4"
 pylint = "*"
 pytest = "*"
 rope = "*"
+nbformat = "*"
 
 [packages]
 dash = "*"
