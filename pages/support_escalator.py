@@ -55,15 +55,21 @@ layout = dbc.Container([
             max_intervals=100
         )], width=12)
     ),
-    dbc.Row(dbc.Col(dcc.Markdown('''
-        Time, however, does not stand still - as visualised by the animation of the chart above.  
+    dbc.Row(dbc.Col(children=[
+        html.Blockquote(children=[
+            html.Img(src="/assets/said_the_Red_Queen.png", width=86, height=100, style={"float":"left", "margin-right":"1rem"}),
+            html.P("Now, here, you see, it takes all the running you can do, to keep in the same place.  If you want to get somewhere else, you must run at least twice as fast as that!"),
+            html.Footer("Lewis Carol", className="blockquote-footer")
+        ], className="blockquote"),
+        dcc.Markdown('''
+        Like the [Red Queen asserts to Alice](https://en.wikipedia.org/wiki/Red_Queen_hypothesis), this isn't a static system.  Observe to how the passing of time impacts the chart above.  
         
-        Every passing month brings the release of the next version closer and - due to the N-2 support policy - 
+        As you can see, every passing month brings the release of the next version closer and - due to the N-2 support policy - 
         so too the end of support for the existing versions.
 
         The result is what we call the "support escalator".  In the same way that you need to constantly be taking steps up an escalator if you wanted to 
         stay still; so to do you constantly need to be planning and executing your next Kubernetes upgrade is you want to stay running a supported version. 
-    '''), width="auto")),
+    ''')], width="auto")),
     dbc.Row(children=[
         dbc.Col(html.Br(), width=8),
         dbc.Col(dcc.Link('Measuring where we are using release age...', href='/pages/release_age'), width=4),
