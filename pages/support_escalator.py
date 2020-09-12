@@ -12,6 +12,7 @@ from upgrade_model import remain_on_latest
 from upgrade_model import k8s_releases_loader
 
 from app import app
+app.set_default_plotly_template()
 
 k8s_releases = k8s_releases_loader.load()
 k8s_releases_date_range = pd.date_range(k8s_releases.release_date.min(),k8s_releases.end_of_support_date.max(), freq='1M').to_list()
@@ -19,7 +20,31 @@ current_date_slider_marks = { i:d.strftime('%Y-%m') if i%6==0 else "" for i, d i
 
 k8s_support_escalator_figure = px.timeline(k8s_releases, x_start="release_date", x_end="end_of_support_date", y="version")
 k8s_support_escalator_figure.add_shape(x0=0.5, y0=0, x1=0.5, y1=1, line=dict(color="Black", width=3), type="line", xref="paper", yref="paper",)
-k8s_support_escalator_figure.update_layout(annotations=[dict(x=0.5, y=1.05, showarrow=False, text="TODAY", xref="paper", yref="paper" )])
+k8s_support_escalator_figure.update_layout(
+    annotations=[dict(x=0.5, y=1.05, showarrow=False, text="TODAY", xref="paper", yref="paper" )],
+    updatemenus=[dict(type="buttons", xanchor="left", yanchor="bottom", x=0.5, y=-0.25,
+        buttons=[dict(label="Play", method="animate",
+            args=[None, 
+            {"frame": {"duration": 30000, 'redraw': True },
+            "fromcurrent": True, "transition": {"duration": 30000, "easing": "linear"}}],
+        )]
+    )],
+)
+k8s_support_escalator_figure.update_xaxes(range=[
+    k8s_releases.release_date.min(),
+    k8s_releases.release_date.min() + relativedelta(years=+1)
+])
+k8s_support_escalator_figure.update_yaxes(range=[0,5])
+k8s_support_escalator_figure['frames'] = [go.Frame(layout=go.Layout(
+    xaxis=dict(range=[
+        k8s_releases.end_of_support_date.max() + relativedelta(years=-1),
+        k8s_releases.end_of_support_date.max()
+    ]),
+    yaxis=dict(range=[
+        len(k8s_releases)-6,
+        len(k8s_releases)
+    ]),
+))]
 
 layout = dbc.Container([
     dbc.Row(dbc.Col(html.H1("The support escalator"))),
@@ -36,24 +61,10 @@ layout = dbc.Container([
     dbc.Row(
         dbc.Col(dcc.Graph(
             id='support-escalator-graph',
+            figure=k8s_support_escalator_figure,
             animate=True,
-            animation_options= { 'frame': { 'redraw': True, }, 'transition': { 'duration': 750, 'easing': 'linear', }, },
+            animation_options= { 'frame': { 'redraw': True, } },
         ), width=12)
-    ),
-    dbc.Row(
-        dbc.Col(children=[ dcc.Slider(
-            id='current-date-slider',
-            min=0,
-            max=len(k8s_releases_date_range),
-            value=6,
-            marks=current_date_slider_marks,
-            step=None
-        ),dcc.Interval(
-            id='advance-current-date-slider-interval',
-            interval=3*1000, # in milliseconds
-            n_intervals=6,
-            max_intervals=100
-        )], width=12)
     ),
     dbc.Row(dbc.Col(children=[
         html.Blockquote(children=[
@@ -62,34 +73,13 @@ layout = dbc.Container([
             html.Footer("Lewis Carol", className="blockquote-footer")
         ], className="blockquote"),
         dcc.Markdown('''
-        Like the [Red Queen asserts to Alice](https://en.wikipedia.org/wiki/Red_Queen_hypothesis), this isn't a static system.  Observe to how the passing of time impacts the chart above.  
-        
+        Like the [Red Queen asserts to Alice](https://en.wikipedia.org/wiki/Red_Queen_hypothesis), this isn't a static system.  Click Play to observe to how the passing of time impacts the chart above.  
+
         As you can see, every passing month brings the release of the next version closer and - due to the N-2 support policy - 
         so too the end of support for the existing versions.
 
         The result is what we call the "support escalator".  In the same way that you need to constantly be taking steps up an escalator if you wanted to 
-        stay still; so to do you constantly need to be planning and executing your next Kubernetes upgrade is you want to stay running a supported version. 
+        stay still; so too do you constantly need to be planning and executing your next Kubernetes upgrade if you want to stay on a supported version. 
     ''')], width="auto")),
-    dbc.Row(children=[
-        dbc.Col(html.Br(), width=8),
-        dbc.Col(dcc.Link('Measuring where we are using release age...', href='/pages/release_age'), width=4),
-    ])
+    dcc.Link('Measuring where we are using release age...', href='/pages/release_age', style={"display":"block", "text-align":"right"})
 ])
-   
-@app.callback(Output('current-date-slider', 'value'),
-            [Input('advance-current-date-slider-interval', 'n_intervals')])
-def advance_slider(n_intervals):
-    return (n_intervals+1) % len(k8s_releases_date_range)
-
-@app.callback(
-    Output('support-escalator-graph', 'figure'),
-    [Input('current-date-slider', 'value')])
-def update_graph(current_mid_date_index):
-    mid_date = k8s_releases_date_range[current_mid_date_index]
-    fig = go.Figure(k8s_support_escalator_figure)
-    fig.update_xaxes(range=[mid_date + relativedelta(months=-6), mid_date + relativedelta(months=+6)])
-    fig.update_yaxes(range=[
-        max(0, k8s_releases.set_index('release_date').index.get_loc(mid_date, method='nearest') - 4),
-        min(len(k8s_releases), k8s_releases.set_index('end_of_support_date').index.get_loc(mid_date, method='nearest') + 4)
-    ])
-    return fig
