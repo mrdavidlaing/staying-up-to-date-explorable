@@ -11,6 +11,7 @@ server = app.server #underlying Flask server - will be used when running via gun
 
 from pages import support_escalator
 from pages import release_age
+from pages import upgrade_effort
 from pages import thanks
 
 app.layout = dbc.Container(children=[
@@ -19,6 +20,7 @@ app.layout = dbc.Container(children=[
         children=[
             dbc.NavItem(dbc.NavLink("Support Escalator", href="/pages/support_escalator")),
             dbc.NavItem(dbc.NavLink("Release Age", href="/pages/release_age")),
+            dbc.NavItem(dbc.NavLink("Upgrade Effort", href="/pages/upgrade_effort")),
         ],
         brand="Staying up-to-date with Kubernetes",
         brand_href="/",
@@ -41,6 +43,8 @@ def display_page(pathname):
         return support_escalator.layout
     elif pathname == '/pages/release_age':
         return release_age.layout
+    elif pathname == '/pages/upgrade_effort':
+        return upgrade_effort.layout
     elif pathname == '/pages/thanks':
         return thanks.layout
     else:

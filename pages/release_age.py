@@ -47,7 +47,7 @@ release_age_measurement_figure.add_annotation(
     showarrow=True, arrowhead=1, arrowsize=0.3, text="release age = 123 days")
 draw_bucket(release_age_measurement_figure, x=k8s_releases.at[8,'release_date'] + relativedelta(months=+4), y=k8s_releases.at[8,'version'])
 
-remain_on_latest_env_state = remain_on_latest.compute(start_date=k8s_releases.release_date.min(), end_date=k8s_releases.end_of_support_date.max())
+remain_on_latest_env_state = remain_on_latest.compute('remain-on-latest-cluster', start_date=k8s_releases.release_date.min(), end_date=k8s_releases.end_of_support_date.max())
 release_age_remain_on_latest_figure = px.line(remain_on_latest_env_state, x="at_date", y="release_age")
 
 layout = html.Div([
