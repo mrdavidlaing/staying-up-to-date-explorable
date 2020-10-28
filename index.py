@@ -15,6 +15,8 @@ from pages import upgrade_effort
 from pages import upgrade_cycle
 from pages import thanks
 
+app.title = "Staying up-to-date with K8s"
+
 app.layout = dbc.Container(children=[
     dcc.Location(id='url', refresh=False),
     html.Header(dbc.NavbarSimple(
