@@ -24,3 +24,4 @@ python_version = "3.8"
 [scripts]
 dashapp_dev = "python index.py"
 deploy_to_pws = 'cf push staying-up-to-date-explorable --strategy rolling -b python_buildpack -m 256M'
+deploy_to_ibm = 'ibmcloud cf push staying-up-to-date-explorable -b python_buildpack -m 256M'
