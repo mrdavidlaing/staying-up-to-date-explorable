@@ -17,6 +17,7 @@ pandas = "*"
 dash-bootstrap-components = "*"
 gunicorn = "*"
 python-dotenv = "*"
+plotly = "*"
 
 [requires]
 python_version = "3.8"
