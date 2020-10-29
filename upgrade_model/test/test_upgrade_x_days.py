@@ -7,7 +7,7 @@ from upgrade_model import upgrade_every_x_days
 def parse_environment_state(csv_data):
     TESTDATA = StringIO(csv_data)
     return pd.read_csv(
-      TESTDATA, sep = '\s+',
+      TESTDATA, sep = r'\s+',
       parse_dates=['at_date', 'release_date', 'end_of_support_date']
     )
 

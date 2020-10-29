@@ -7,7 +7,7 @@ from upgrade_model import upgrade_cycle
 
 def parse_steps(csv_data):
     return pd.read_csv(
-      StringIO(csv_data), sep = '\s+',
+      StringIO(csv_data), sep = r'\s+',
       parse_dates=['start_date', 'finish_date']
     )
 
