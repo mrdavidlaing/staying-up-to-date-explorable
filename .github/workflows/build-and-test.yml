@@ -22,7 +22,7 @@ jobs:
         pipenv install --dev --verbose
     - name: Lint with pylint
       run: |
-        pylint **/*.py
+        pipenv run pylint **/*.py
     - name: Test with pytest
       run: |
-        pytest
+        pipenv run pytest
