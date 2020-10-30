@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip pipenv
-        pipenv install --verbose
+        pipenv install --dev --verbose
     - name: Lint with pylint
       run: |
         pylint **/*.py
