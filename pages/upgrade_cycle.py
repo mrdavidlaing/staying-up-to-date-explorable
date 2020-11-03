@@ -37,10 +37,11 @@ fig_single = px.timeline(df_upgrade_steps_single, x_start="start_date", x_end="f
 fig_single.update_yaxes(autorange="reversed") # otherwise tasks are listed from the bottom up
 add_weekend_markers(fig_single, min(df_upgrade_steps_single.start_date), max(df_upgrade_steps_single.finish_date))
 
-def generate_upgrade_steps(environment_groups):
+def generate_upgrade_steps(environment_groups, upgrade_failure_percentage):
     df_upgrade_steps_many = upgrade_cycle.compute_next_upgrade_cycle(
         start_date = datetime.fromisoformat('2020-01-01'),
-        environment_groups = environment_groups
+        environment_groups = environment_groups,
+        upgrade_failure_percentage = upgrade_failure_percentage
     )
 
     fig_many = px.timeline(df_upgrade_steps_many, x_start="start_date", x_end="finish_date", y="phase", color="step")
@@ -89,7 +90,7 @@ layout = dbc.Container([
             ),
             html.Label('Chance of upgrade failure'),
             dcc.Slider(
-                id="upgrade_failure_percent",
+                id="upgrade_failure_percentage",
                 min=10, max=90,
                 marks={i: f'{i}%' for i in [10,25,50,75,90]},
                 value=25,
@@ -123,13 +124,15 @@ layout = dbc.Container([
     [
         Input(component_id='environment_groups', component_property='value'),
         Input(component_id='environments_per_group', component_property='value'),
+        Input(component_id='upgrade_failure_percentage', component_property='value'),
     ]
 )
-def update_output(environment_group_count, environments_per_group):
+def update_output(environment_group_count, environments_per_group, upgrade_failure_percentage):
     return generate_upgrade_steps(
         environment_groups=[
             upgrade_cycle.EnvironmentGroup(f'Group {i+1}', [
                 upgrade_cycle.Environment(f'Cluster {j+1}') for j in range(environments_per_group) 
             ]) for i in range(environment_group_count) 
-        ]
+        ],
+        upgrade_failure_percentage = upgrade_failure_percentage/100
     )
