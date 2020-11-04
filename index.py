@@ -22,9 +22,9 @@ app.layout = dbc.Container(children=[
     html.Header(dbc.NavbarSimple(
         children=[
             dbc.NavItem(dbc.NavLink("Support Escalator", href="/pages/support_escalator")),
+            dbc.NavItem(dbc.NavLink("Upgrade Cycle", href="/pages/upgrade_cycle")),
             dbc.NavItem(dbc.NavLink("Release Age", href="/pages/release_age")),
             dbc.NavItem(dbc.NavLink("Upgrade Effort", href="/pages/upgrade_effort")),
-            dbc.NavItem(dbc.NavLink("Upgrade Cycle", href="/pages/upgrade_cycle")),
         ],
         brand="Staying up-to-date with Kubernetes",
         brand_href="/",
