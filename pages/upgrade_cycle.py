@@ -41,6 +41,9 @@ def generate_upgrade_steps(environment_groups, upgrade_failure_percentage, maint
     fig_upgrade_steps = px.timeline(df_upgrade_steps, x_start="start_date", x_end="finish_date", y="phase", color="step")
     fig_upgrade_steps.update_yaxes(title=None)
     add_weekend_markers(fig_upgrade_steps, df_upgrade_steps.start_date.min(), df_upgrade_steps.finish_date.max())
+    cycle_start = df_upgrade_steps.start_date.min()
+    cycle_end = df_upgrade_steps.finish_date.max()
+    fig_upgrade_steps.update_layout(title=f"Upgrade cycle: {cycle_start.date()} to {cycle_end.date()} = {(cycle_end - cycle_start).days} days")
 
     return fig_upgrade_steps
 #%%
@@ -250,6 +253,10 @@ def generate_upgrade_steps_with_support_elevator(environment_groups, upgrade_fai
         df_upgrade_steps.finish_date.max() + timedelta(days=7)
     ])
     
+    cycle_start = df_upgrade_steps.start_date.min()
+    cycle_end = df_upgrade_steps.finish_date.max()
+    fig.update_layout(title=f"Upgrade cycle: {cycle_start.date()} to {cycle_end.date()} = {(cycle_end - cycle_start).days} days")
+
     return fig
 
 @app.callback(
