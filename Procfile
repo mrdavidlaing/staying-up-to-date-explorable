@@ -1,1 +1,1 @@
-web: gunicorn --bind=0.0.0.0:8080 index:server
+web: gunicorn --bind=0.0.0.0:8080 --workers=1 --threads=3 index:server
