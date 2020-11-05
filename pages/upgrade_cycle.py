@@ -1,6 +1,7 @@
 #%%
 from datetime import datetime
 from datetime import timedelta
+from distutils.version import LooseVersion
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 import dash_html_components as html
@@ -19,6 +20,20 @@ from upgrade_model import upgrade_cycle
 
 from app import app
 app.set_default_plotly_template()
+
+k8s_releases = k8s_releases_loader.load()
+def k8s_versions_sorted():
+    return sorted(k8s_releases.version, key=lambda v: LooseVersion(v))
+def versions_greater_than(version):
+    return filter(
+        lambda v: LooseVersion(v) > LooseVersion(version),
+        k8s_versions_sorted()
+    )
+def k8s_releases_between(start_version, end_version):
+    return filter(
+        lambda v: LooseVersion(v) >= LooseVersion(start_version) and LooseVersion(v) <= LooseVersion(end_version),
+        k8s_versions_sorted()
+    )
 
 def add_weekend_markers(fig, start_date, end_date, fillcolor="LightGray"):
     for day in pd.date_range(start_date, end_date):
@@ -208,6 +223,35 @@ layout = dbc.Container([
         ''')
     ])),
     dbc.Card([
+        dbc.CardHeader([
+            dbc.Row([
+                dbc.Col([
+                    html.Table([
+                        html.Tr([
+                            html.Th([ html.Label('Start version') ]), 
+                            html.Td([ dcc.Dropdown(
+                                    id="start_version", style={'width':"5em", 'margin-right':'0.75em'},
+                                    options=[
+                                        {'label': version, 'value': version } for version in k8s_versions_sorted()
+                                    ],
+                                    value='1.15.0'
+                                )
+                            ]),
+                            html.Th([ html.Label('Target version') ]), 
+                            html.Td([ dcc.Dropdown(
+                                   id="target_version", style={'width':"5em", 'margin-right':'0.75em'},
+                                   options=[
+                                        {'label': version, 'value': version } for version in versions_greater_than('1.15.0')
+                                    ],
+                                    value='1.18.0'
+                                )
+                            ]),
+                            html.Td([ html.Button('Re-calculate', id='recalc-button-with-support-escalator') ])
+                        ]),
+                    ])
+                ], width="auto"),
+            ]),
+        ]),
         dbc.CardBody([
             dbc.Row(
                 dbc.Col(dcc.Loading(children=[dcc.Graph(
@@ -241,13 +285,12 @@ def update_output(environment_group_count, environments_per_group, upgrade_failu
     )
 
 #EXPERIMENTAL: This visualisation might be a bit busy
-def generate_upgrade_steps_with_support_elevator(start_date, upgrade_version_sequence, environment_groups, upgrade_failure_percentage, maintenance_window):
+def generate_upgrade_steps_with_support_elevator(start_date, start_version, target_version, environment_groups, upgrade_failure_percentage, maintenance_window):
     df_upgrade_steps = pd.DataFrame()
     next_start_date = start_date
-    start_version = upgrade_version_sequence[0]
-    end_version = upgrade_version_sequence[-1]
+    upgrade_version_sequence = list(k8s_releases_between(start_version, target_version))
 
-    for current_version, next_version in zip(upgrade_version_sequence, upgrade_version_sequence[1:]):
+    for current_version, next_version in zip(upgrade_version_sequence, upgrade_version_sequence[1:]): #loops through version pairs
         df_next_upgrade_steps = upgrade_cycle.compute_next_upgrade_cycle(
             start_date = next_start_date,
             environment_groups = environment_groups,
@@ -258,8 +301,6 @@ def generate_upgrade_steps_with_support_elevator(start_date, upgrade_version_seq
         df_upgrade_steps = pd.concat([df_upgrade_steps, df_next_upgrade_steps], sort=False)
         next_start_date = df_upgrade_steps.finish_date.max()
             
-    k8s_releases = k8s_releases_loader.load()
-
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     
     fig_upgrade_steps = px.timeline(
@@ -284,17 +325,32 @@ def generate_upgrade_steps_with_support_elevator(start_date, upgrade_version_seq
     #Format the (right) support escalator axis
     fig.update_yaxes(secondary_y=False, side='right', visible=False, range=[
         k8s_releases.version[k8s_releases.version == start_version ].index[0],
-        k8s_releases.version[k8s_releases.version == end_version].index[0],
+        k8s_releases.version[k8s_releases.version == target_version].index[0],
     ])
 
     cycle_start = df_upgrade_steps.start_date.min()
     cycle_end = df_upgrade_steps.finish_date.max()
     fig.update_layout(
-        title_text=f"{start_version} -> {end_version}: ({cycle_start.date()} to {cycle_end.date()}) = {(cycle_end - cycle_start).days} days", title_x=0.01,
+        title_text=f"{start_version} -> {target_version}: ({cycle_start.date()} to {cycle_end.date()}) = {(cycle_end - cycle_start).days} days", title_x=0.01,
         height=700,
     )
 
     return fig
+
+@app.callback(
+    Output(component_id='target_version', component_property='options'),
+    [
+        Input(component_id='start_version', component_property='value'),
+    ]
+)
+def update_target_version_dropdown(start_version):
+    if not start_version:
+        raise PreventUpdate
+
+    return [
+        {'label': version, 'value': version } for version in versions_greater_than(start_version) 
+    ]
+
 
 @app.callback(
     Output(component_id='upgrade-cycle-many-with-support-escalator', component_property='figure'),
@@ -303,13 +359,19 @@ def generate_upgrade_steps_with_support_elevator(start_date, upgrade_version_seq
         Input(component_id='environments_per_group', component_property='value'),
         Input(component_id='upgrade_failure_percentage', component_property='value'),
         Input(component_id='maintenance_window', component_property='value'),
-        Input(component_id='recalc-button', component_property='n_clicks'),
+        Input(component_id='start_version', component_property='value'),
+        Input(component_id='target_version', component_property='value'),
+        Input(component_id='recalc-button-with-support-escalator', component_property='n_clicks'),
     ]
 )
-def update_output_with_support_escalator(environment_group_count, environments_per_group, upgrade_failure_percentage, maintenance_window, recalc_counter):
+def update_output_with_support_escalator(environment_group_count, environments_per_group, upgrade_failure_percentage, maintenance_window, start_version, target_version, recalc_counter):
+    if 'recalc-button-with-support-escalator' not in [p['prop_id'] for p in dash.callback_context.triggered][0]:
+        raise PreventUpdate
+    
     return generate_upgrade_steps_with_support_elevator(
         start_date = datetime.fromisoformat('2020-03-01'),
-        upgrade_version_sequence = ['1.15.0','1.16.0','1.17.0','1.18.0'],
+        start_version = start_version,
+        target_version = target_version,
         environment_groups=[
             upgrade_cycle.EnvironmentGroup(f'Group {i+1}', [
                 upgrade_cycle.Environment(f'Cluster {(i)*environments_per_group + (j+1)}') for j in range(environments_per_group) 
@@ -318,6 +380,4 @@ def update_output_with_support_escalator(environment_group_count, environments_p
         upgrade_failure_percentage = upgrade_failure_percentage/100,
         maintenance_window = maintenance_window
     )
-# %%
-
 # %%
