@@ -43,7 +43,9 @@ def generate_upgrade_steps(environment_groups, upgrade_failure_percentage, maint
     add_weekend_markers(fig_upgrade_steps, df_upgrade_steps.start_date.min(), df_upgrade_steps.finish_date.max())
     cycle_start = df_upgrade_steps.start_date.min()
     cycle_end = df_upgrade_steps.finish_date.max()
-    fig_upgrade_steps.update_layout(title=f"Upgrade cycle: {cycle_start.date()} to {cycle_end.date()} = {(cycle_end - cycle_start).days} days")
+    fig_upgrade_steps.update_layout(
+        title_text=f"Upgrade cycle: {cycle_start.date()} to {cycle_end.date()} = {(cycle_end - cycle_start).days} days", title_x=0.01,
+    )
 
     return fig_upgrade_steps
 #%%
