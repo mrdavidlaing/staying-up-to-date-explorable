@@ -197,15 +197,26 @@ layout = dbc.Container([
     ]),
     dbc.Row(dbc.Col(width="auto", children=[
         dcc.Markdown('''
-        EXPERIMENTAL: Alternate view showing the support escalator in the background
+        ## Staying on the Support Escalator
+
+        As discussed previously; staying up-to-date is a moving target.  As soon as an upgrade-cycle is completed the next cycle begins.
+
+        The visualisation below shows back-to-back upgrade cycles overlayed on the support escalator.
+
+        Can you see:
+        * Which clusters were running K8s v1.15.0 past its end of support date?
         ''')
     ])),
-    dbc.Row(
-        dbc.Col(dcc.Loading(children=[dcc.Graph(
-            id='upgrade-cycle-many-with-support-escalator',
-            animate=False, #False ensures the axes are redrawn when the graph content changes
-        )]), width=12)
-    ),
+    dbc.Card([
+        dbc.CardBody([
+            dbc.Row(
+                dbc.Col(dcc.Loading(children=[dcc.Graph(
+                    id='upgrade-cycle-many-with-support-escalator',
+                    animate=False, #False ensures the axes are redrawn when the graph content changes
+                )]), width=12)
+            ),
+        ])
+    ])
 ])
 
 @app.callback(
@@ -307,3 +318,6 @@ def update_output_with_support_escalator(environment_group_count, environments_p
         upgrade_failure_percentage = upgrade_failure_percentage/100,
         maintenance_window = maintenance_window
     )
+# %%
+
+# %%
