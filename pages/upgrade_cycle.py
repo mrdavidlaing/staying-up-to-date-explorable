@@ -97,7 +97,9 @@ layout = dbc.Container([
     ]),
     dbc.Row(dbc.Col(width="auto", children=[
         dcc.Markdown('''
-        Use the settings below to visualise the impact of different factors on the length of an upgrade cycle.
+        ## Impact of different factors
+
+        Change the settings below to visualise the impact of different factors on the length of an upgrade cycle.
 
         What happens when:
         * The number of groups and clusters changes?
@@ -160,20 +162,20 @@ layout = dbc.Container([
                             ], colSpan=2) 
                         ]),
                     ])
-                ], width=7),
+                ], width=8),
                 dbc.Col([
                     html.Table([
                         html.Tr([
                             html.Th([ html.Label('Groups') ]), 
                             html.Td([ dcc.Input(
-                                        id="environment_groups", type="number", min=1, max=25, value=3,
+                                        id="environment_groups", type="number", min=1, max=25, value=3, style={'width':'3rem'}, debounce=True,
                                     ),
                             ]) 
                         ]),
                         html.Tr([
                             html.Th([ html.Label('Clusters / group') ]), 
                             html.Td([ dcc.Input(
-                                        id="environments_per_group", type="number", min=1, max=25, value=3,
+                                        id="environments_per_group", type="number", min=1, max=25, value=3, style={'width':'3rem'}, debounce=True,
                                     ),
                             ]) 
                         ]),
@@ -181,7 +183,7 @@ layout = dbc.Container([
                             html.Td([ html.Button('Re-calculate', id='recalc-button') ], colSpan=2)
                         ])
                     ])            
-                ], width=5)
+                ], width=4)
             ]),
         ]),
         dbc.CardBody([
@@ -220,7 +222,7 @@ def update_output(environment_group_count, environments_per_group, upgrade_failu
     return generate_upgrade_steps(
         environment_groups=[
             upgrade_cycle.EnvironmentGroup(f'Group {i+1}', [
-                upgrade_cycle.Environment(f'Cluster {j+1}') for j in range(environments_per_group) 
+                upgrade_cycle.Environment(f'Cluster {(i)*environments_per_group + (j+1)}') for j in range(environments_per_group) 
             ]) for i in range(environment_group_count) 
         ],
         upgrade_failure_percentage = upgrade_failure_percentage/100,
@@ -237,14 +239,14 @@ def generate_upgrade_steps_with_support_elevator(start_date, upgrade_version_seq
     for current_version, next_version in zip(upgrade_version_sequence, upgrade_version_sequence[1:]):
         df_next_upgrade_steps = upgrade_cycle.compute_next_upgrade_cycle(
             start_date = next_start_date,
-        environment_groups = environment_groups,
-        upgrade_failure_percentage = upgrade_failure_percentage,
-        maintenance_window = maintenance_window
-    )
+            environment_groups = environment_groups,
+            upgrade_failure_percentage = upgrade_failure_percentage,
+            maintenance_window = maintenance_window
+        )
         df_next_upgrade_steps.phase = f"{current_version} -> {next_version}: " + df_next_upgrade_steps.phase
         df_upgrade_steps = pd.concat([df_upgrade_steps, df_next_upgrade_steps], sort=False)
         next_start_date = df_upgrade_steps.finish_date.max()
-    
+            
     k8s_releases = k8s_releases_loader.load()
 
     fig = make_subplots(specs=[[{"secondary_y": True}]])
@@ -258,11 +260,11 @@ def generate_upgrade_steps_with_support_elevator(start_date, upgrade_version_seq
     fig.add_traces(fig_upgrade_steps.data + fig_support_escalator.data)
     add_weekend_markers(fig, df_upgrade_steps.start_date.min(), df_upgrade_steps.finish_date.max())
     fig.update_layout(fig_upgrade_steps.layout)
-    
+
     fig.update_xaxes(range=[
         df_upgrade_steps.start_date.min()  - timedelta(days=7), 
         df_upgrade_steps.finish_date.max() + timedelta(days=7)
-    ])
+    ])    
     #Format the (left) upgrade steps axis
     fig.update_yaxes(
         secondary_y=True, side='left', 
@@ -273,7 +275,7 @@ def generate_upgrade_steps_with_support_elevator(start_date, upgrade_version_seq
         k8s_releases.version[k8s_releases.version == start_version ].index[0],
         k8s_releases.version[k8s_releases.version == end_version].index[0],
     ])
-    
+
     cycle_start = df_upgrade_steps.start_date.min()
     cycle_end = df_upgrade_steps.finish_date.max()
     fig.update_layout(
@@ -299,7 +301,7 @@ def update_output_with_support_escalator(environment_group_count, environments_p
         upgrade_version_sequence = ['1.15.0','1.16.0','1.17.0','1.18.0'],
         environment_groups=[
             upgrade_cycle.EnvironmentGroup(f'Group {i+1}', [
-                upgrade_cycle.Environment(f'Cluster {j+1}') for j in range(environments_per_group) 
+                upgrade_cycle.Environment(f'Cluster {(i)*environments_per_group + (j+1)}') for j in range(environments_per_group) 
             ]) for i in range(environment_group_count) 
         ],
         upgrade_failure_percentage = upgrade_failure_percentage/100,
