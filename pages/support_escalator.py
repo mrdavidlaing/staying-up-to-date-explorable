@@ -58,28 +58,41 @@ layout = dbc.Container([
         At any point in time there are 3 versions of Kubernetes which are supported.  This is shown by the intersection of the vertical TODAY line
         and 3 of the horizontal version lines.
     '''), width="auto")),
-    dbc.Row(
-        dbc.Col(dcc.Graph(
-            id='support-escalator-graph',
-            figure=k8s_support_escalator_figure,
-            animate=True,
-            animation_options= { 'frame': { 'redraw': True, } },
-        ), width=12)
-    ),
-    dbc.Row(dbc.Col(children=[
-        html.Blockquote(children=[
-            html.Img(src="/assets/said_the_Red_Queen.png", width=86, height=100, style={"float":"left", "margin-right":"1rem"}),
-            html.P("Now, here, you see, it takes all the running you can do, to keep in the same place.  If you want to get somewhere else, you must run at least twice as fast as that!"),
-            html.Footer("Lewis Carol", className="blockquote-footer")
-        ], className="blockquote"),
+    dbc.Card([
+        dbc.CardBody([
+            dbc.Row(
+                dbc.Col(dcc.Graph(
+                    id='support-escalator-graph',
+                    figure=k8s_support_escalator_figure,
+                    animate=True,
+                    animation_options= { 'frame': { 'redraw': True, } },
+                ), width=12)
+            ),
+        ]),
+        dbc.CardFooter([
+            dbc.Row(dbc.Col(children=[
+                    html.Blockquote(children=[
+                        html.Img(src="/assets/said_the_Red_Queen.png", width=86, height=100, style={"float":"left", "margin-right":"1rem"}),
+                        html.P("Now, here, you see, it takes all the running you can do, to keep in the same place.  If you want to get somewhere else, you must run at least twice as fast as that!"),
+                        html.Footer("Lewis Carol", className="blockquote-footer")
+                    ], className="blockquote"),
+                ])
+            )
+        ])
+    ]),
+    dbc.Row(dbc.Col(width="auto", children=[
         dcc.Markdown('''
-        Like the [Red Queen asserts to Alice](https://en.wikipedia.org/wiki/Red_Queen_hypothesis), this isn't a static system.  Click Play to observe to how the passing of time impacts the chart above.  
+            Like the [Red Queen asserts to Alice](https://en.wikipedia.org/wiki/Red_Queen_hypothesis), this isn't a static system.  Click Play to observe to how the passing of time impacts the chart above.  
 
-        As you can see, every passing month brings the release of the next version closer and - due to the N-2 support policy - 
-        so too the end of support for the existing versions.
+            As you can see, every passing month brings the release of the next version closer and - due to the N-2 support policy - 
+            so too the end of support for the existing versions.
 
-        The result is what we call the "support escalator".  In the same way that you need to constantly be taking steps up an escalator if you wanted to 
-        stay still; so too do you constantly need to be planning and executing your next Kubernetes upgrade if you want to stay on a supported version. 
-    ''')], width="auto")),
-    dcc.Link('Measuring where we are using release age...', href='/pages/release_age', style={"display":"block", "text-align":"right"})
+            The result is what we call the "support escalator".  In the same way that you need to constantly be taking steps up an escalator if you wanted to 
+            stay still; so too do you constantly need to be planning and executing your next Kubernetes upgrade if you want to stay on a supported version. 
+        ''')
+        ])
+    ),
+    dbc.Row(dbc.Col(
+        dcc.Link('What steps are involved in an upgrade? How long does it take?  Read on...', href='/pages/upgrade_cycle', style={"display":"block", "text-align":"right"})
+    ))
 ])
