@@ -11,8 +11,8 @@ server = app.server #underlying Flask server - will be used when running via gun
 
 from pages import home
 from pages import support_escalator
-from pages import release_age
 from pages import upgrade_cycle
+from pages import fleet_metrics
 from pages import thanks
 
 app.title = "Staying up-to-date with K8s"
@@ -23,7 +23,7 @@ app.layout = dbc.Container(children=[
         children=[
             dbc.NavItem(dbc.NavLink("Support Escalator", href="/pages/support_escalator")),
             dbc.NavItem(dbc.NavLink("Upgrade Cycle", href="/pages/upgrade_cycle")),
-            dbc.NavItem(dbc.NavLink("Release Age", href="/pages/release_age")),
+            dbc.NavItem(dbc.NavLink("Fleet Metrics", href="/pages/fleet_metrics")),
         ],
         brand="Staying up-to-date with Kubernetes",
         brand_href="/",
@@ -48,10 +48,10 @@ Feedback for this [page]({github_page_ref})/[project](https://github.com/users/m
 def display_page(pathname):
     if pathname == '/pages/support_escalator':
         return support_escalator.layout, generate_footer_markdown('https://github.com/mrdavidlaing/staying-up-to-date-explorable/blob/main/pages/support_escalator.py')
-    elif pathname == '/pages/release_age':
-        return release_age.layout, generate_footer_markdown('https://github.com/mrdavidlaing/staying-up-to-date-explorable/blob/main/pages/release_age.py')
     elif pathname == '/pages/upgrade_cycle':
         return upgrade_cycle.layout, generate_footer_markdown('https://github.com/mrdavidlaing/staying-up-to-date-explorable/blob/main/pages/upgrade_cycle.py')
+    elif pathname == '/pages/fleet_metrics':
+        return fleet_metrics.layout, generate_footer_markdown('https://github.com/mrdavidlaing/staying-up-to-date-explorable/blob/main/pages/fleet_metrics.py')
     elif pathname == '/pages/thanks':
         return thanks.layout, generate_footer_markdown('https://github.com/mrdavidlaing/staying-up-to-date-explorable/blob/main/pages/thanks.py')
     else:
