@@ -9,6 +9,7 @@ from app import app
 app.set_default_plotly_template()
 server = app.server #underlying Flask server - will be used when running via gunicorn
 
+from pages import home
 from pages import support_escalator
 from pages import release_age
 from pages import upgrade_effort
@@ -34,35 +35,31 @@ app.layout = dbc.Container(children=[
     )),
     html.Br(),
     html.Div(id='page-content'),
-    dbc.Container(children=[dcc.Markdown('''
-      [Thanks & Credits](/pages/thanks) | Copyright &copy; 2020 [David Laing](https://www.linkedin.com/in/mrdavidlaing/) | 
-      [Source code](https://github.com/mrdavidlaing/staying-up-to-date-explorable) licensed under [MIT](https://github.com/mrdavidlaing/staying-up-to-date-explorable/blob/main/LICENSE)
-    ''', className="text-muted")], className="footer")
+    dbc.Container(children=[dcc.Markdown(id='footer', className="text-muted")], className="footer")
 ])
+def generate_footer_markdown(github_page_ref):
+    return f'''
+Feedback for this [page]({github_page_ref})/[project](https://github.com/users/mrdavidlaing/projects/1) | 
+[Thanks & Credits](/pages/thanks) | Copyright &copy; 2020 [David Laing](https://www.linkedin.com/in/mrdavidlaing/) | 
+[Source code](https://github.com/mrdavidlaing/staying-up-to-date-explorable) licensed under [MIT](https://github.com/mrdavidlaing/staying-up-to-date-explorable/blob/main/LICENSE)
+    '''
 
-@app.callback(Output('page-content', 'children'),
+@app.callback([Output('page-content', 'children'),
+               Output('footer', 'children')],
               [Input('url', 'pathname')])
 def display_page(pathname):
     if pathname == '/pages/support_escalator':
-        return support_escalator.layout
+        return support_escalator.layout, generate_footer_markdown('https://github.com/mrdavidlaing/staying-up-to-date-explorable/blob/main/pages/support_escalator.py')
     elif pathname == '/pages/release_age':
-        return release_age.layout
+        return release_age.layout, generate_footer_markdown('https://github.com/mrdavidlaing/staying-up-to-date-explorable/blob/main/pages/release_age.py')
     elif pathname == '/pages/upgrade_effort':
-        return upgrade_effort.layout
+        return upgrade_effort.layout, generate_footer_markdown('https://github.com/mrdavidlaing/staying-up-to-date-explorable/blob/main/pages/upgrade_effort.py')
     elif pathname == '/pages/upgrade_cycle':
-        return upgrade_cycle.layout
+        return upgrade_cycle.layout, generate_footer_markdown('https://github.com/mrdavidlaing/staying-up-to-date-explorable/blob/main/pages/upgrade_cycle.py')
     elif pathname == '/pages/thanks':
-        return thanks.layout
+        return thanks.layout, generate_footer_markdown('https://github.com/mrdavidlaing/staying-up-to-date-explorable/blob/main/pages/thanks.py')
     else:
-        return html.Div([
-            dcc.Markdown('''
-                If you've ever developed a popular software package with multiple releases over a number of years; you may have been dismayed to discover 
-                that many of your users "fall behind" and continue to use old versions that you no longer support.
-
-                This [Explorable Explanation](https://explorabl.es/) attempts to explain why...
-            '''),
-            dcc.Link('Get started learning about the support escalator...', href='/pages/support_escalator', style={"display":"block", "text-align":"right"})
-        ])
+        return home.layout, generate_footer_markdown('https://github.com/mrdavidlaing/staying-up-to-date-explorable/blob/main/pages/home.py')
 
 if __name__ == '__main__':
     app.run_server(debug=True)
