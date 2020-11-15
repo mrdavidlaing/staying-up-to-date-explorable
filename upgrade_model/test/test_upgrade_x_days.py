@@ -30,10 +30,10 @@ def test_should_change_version_every_upgrade():
     # print("\n",rows_with_changes_in(environment_state,'version'))
     
     assert_frame_equal(rows_with_changes_in(environment_state,'version').reset_index(drop=True), parse_environment_state('''
-environment_id          at_date     version release_date  end_of_support_date  release_age
-upgrade-every-30-days   2018-01-01   1.7.0  2017-06-30    2018-03-26           185
-upgrade-every-30-days   2018-01-31   1.8.0  2017-09-29    2018-06-27           124
-upgrade-every-30-days   2018-03-02   1.9.0  2017-12-15    2018-09-27           77
+environment_id          at_date     version release_date  end_of_support_date  release_age days_until_end_of_support
+upgrade-every-30-days   2018-01-01   1.7.0  2017-06-30    2018-03-26           185         84
+upgrade-every-30-days   2018-01-31   1.8.0  2017-09-29    2018-06-27           124         147
+upgrade-every-30-days   2018-03-02   1.9.0  2017-12-15    2018-09-27           77          209
 ''').reset_index(drop=True))
 
 def test_should_not_upgrade_if_new_version_not_available():
@@ -44,10 +44,10 @@ def test_should_not_upgrade_if_new_version_not_available():
     #print("\n",rows_with_changes_in(environment_state,'version'))
     
     assert_frame_equal(rows_with_changes_in(environment_state,'version').reset_index(drop=True), parse_environment_state('''
-environment_id      at_date     version  release_date end_of_support_date  release_age
-upgrade-every-1-day 2018-01-01   1.8.0   2017-09-29   2018-06-27           94
-upgrade-every-1-day 2018-01-02   1.9.0   2017-12-15   2018-09-27           18
-upgrade-every-1-day 2018-03-26  1.10.0   2018-03-26   2018-12-03            0
-upgrade-every-1-day 2018-06-27  1.11.0   2018-06-27   2019-03-25            0
-upgrade-every-1-day 2018-09-27  1.12.0   2018-09-27   2019-06-19            0
+environment_id      at_date     version  release_date end_of_support_date  release_age days_until_end_of_support
+upgrade-every-1-day 2018-01-01   1.8.0   2017-09-29   2018-06-27           94          177
+upgrade-every-1-day 2018-01-02   1.9.0   2017-12-15   2018-09-27           18          268
+upgrade-every-1-day 2018-03-26  1.10.0   2018-03-26   2018-12-03            0          252
+upgrade-every-1-day 2018-06-27  1.11.0   2018-06-27   2019-03-25            0          271 
+upgrade-every-1-day 2018-09-27  1.12.0   2018-09-27   2019-06-19            0          265
 ''').reset_index(drop=True))
