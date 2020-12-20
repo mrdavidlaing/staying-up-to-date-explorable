@@ -1,0 +1,21 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: staying-up-to-date-explorable-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: staying-up-to-date-explorable-app
+  template:
+    metadata:
+      labels:
+        app: staying-up-to-date-explorable-app
+    spec:
+      containers:    
+      - name: staying-up-to-date-explorable-container
+        image: gcr.io/mrdavidlaing/staying-up-to-date-explorable:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080

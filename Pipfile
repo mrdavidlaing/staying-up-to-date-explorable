@@ -26,3 +26,4 @@ python_version = "3.8"
 dashapp_dev = "python index.py"
 deploy_to_pws = 'cf push staying-up-to-date-explorable --strategy rolling -b python_buildpack -m 128M'
 deploy_to_ibm = 'ibmcloud cf push staying-up-to-date-explorable -b python_buildpack -m 128M'
+docker_build = 'docker build -t gcr.io/mrdavidlaing/staying-up-to-date-explorable:latest . && docker push gcr.io/mrdavidlaing/staying-up-to-date-explorable:latest'
