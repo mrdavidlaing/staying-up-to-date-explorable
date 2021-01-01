@@ -26,7 +26,7 @@ spec:
             topologyKey: kubernetes.io/hostname
       containers:    
       - name: staying-up-to-date-explorable-container
-        image: gcr.io/mrdavidlaing/staying-up-to-date-explorable:latest
+        image: eu.gcr.io/mrdavidlaing/staying-up-to-date-explorable:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
