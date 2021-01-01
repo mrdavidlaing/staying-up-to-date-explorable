@@ -24,7 +24,5 @@ python_version = "3.8"
 
 [scripts]
 dashapp_dev = "python index.py"
-deploy_to_pws = 'cf push staying-up-to-date-explorable --strategy rolling -b python_buildpack -m 128M'
-deploy_to_ibm = 'ibmcloud cf push staying-up-to-date-explorable -b python_buildpack -m 128M'
-docker_build = 'docker build -t gcr.io/mrdavidlaing/staying-up-to-date-explorable:latest . && docker push gcr.io/mrdavidlaing/staying-up-to-date-explorable:latest'
-deploy_to_k8s = 'kubectl apply -f kubernetes-manifest.yaml && kubectl rollout restart deployment staying-up-to-date-explorable-app'
+docker_build = 'docker build -t eu.gcr.io/mrdavidlaing/staying-up-to-date-explorable:latest .'
+docker_push = 'docker push eu.gcr.io/mrdavidlaing/staying-up-to-date-explorable:latest'
